@@ -79,13 +79,12 @@ class Drupal_Sniffs_WhiteSpace_FileEndSniff implements PHP_CodeSniffer_Sniff
             }
             $content = file_get_contents($filename);
             $error = false;
-            $lastChar = substr($content, -1);
-            // There must be a \n character at the end of the last token.
-            if ($lastChar !== $phpcsFile->eolChar) {
+            // There must be a blank newline at the end of the file.
+            if (substr($content, -2, 1) !== $phpcsFile->eolChar) {
                 $error = true;
             }
-            // There must be only one \n character at the end of the file.
-            else if (substr($content, -2, 1) === $phpcsFile->eolChar) {
+            // There must be only one blank newline at the end of the file.
+            else if (substr($content, -3, 1) === $phpcsFile->eolChar) {
                 $error = true;
             }
 

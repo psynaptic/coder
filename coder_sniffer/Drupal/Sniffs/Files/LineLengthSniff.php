@@ -50,7 +50,7 @@ class Drupal_Sniffs_Files_LineLengthSniff extends Generic_Sniffs_Files_LineLengt
     protected function checkLineLength(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $lineContent)
     {
         $tokens = $phpcsFile->getTokens();
-        if ($tokens[$stackPtr]['code'] === T_DOC_COMMENT || $tokens[$stackPtr]['code'] === T_COMMENT) {
+        if (isset($tokens[$stackPtr]['code']) && ($tokens[$stackPtr]['code'] === T_DOC_COMMENT || $tokens[$stackPtr]['code'] === T_COMMENT)) {
             if (preg_match('/^[[:space:]]*(\/\*)?\*[[:space:]]*@link.*@endlink[[:space:]]*/', $lineContent) === 1) {
                 // Allow @link documentation to exceed the 80 character limit.
                 return;

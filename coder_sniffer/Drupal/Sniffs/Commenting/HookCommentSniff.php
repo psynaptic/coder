@@ -20,6 +20,17 @@ class Drupal_Sniffs_Commenting_HookCommentSniff implements PHP_CodeSniffer_Sniff
 {
 
     /**
+     * Whether or not to perform strict checking.
+     *
+     * Strict mode will check that the hook documentation contains "Implements"
+     * (but not "Implements of") whereas non-strict mode will allow hook
+     * documentation to contain either "Implements" or "Implementation of".
+     *
+     * @var bool
+     */
+    public $strict = true;
+
+    /**
      * Returns an array of tokens this test wants to listen for.
      *
      * @return array
@@ -87,10 +98,37 @@ class Drupal_Sniffs_Commenting_HookCommentSniff implements PHP_CodeSniffer_Sniff
 
         // Check if hook implementation doc is formated correctly.
         if (preg_match('/^[\s]*Implement[^\n]+?hook_[^\n]+/i', $shortContent, $matches)) {
-            if (!strstr($matches[0], 'Implements ') || strstr($matches[0], 'Implements of')
-                || !preg_match('/ (drush_)?hook_[a-zA-Z0-9_]+\(\)( for [a-z0-9_-]+(\(\)|\.tpl\.php|\.html.twig))?\.$/', $matches[0])
-            ) {
-                $phpcsFile->addWarning('Format should be "* Implements hook_foo().", "* Implements hook_foo_BAR_ID_bar() for xyz_bar().",, "* Implements hook_foo_BAR_ID_bar() for xyz-bar.html.twig.", or "* Implements hook_foo_BAR_ID_bar() for xyz-bar.tpl.php.".', $short);
+            $displayWarning = false;
+            // Always display a warning for "Implements of ".
+            if (strstr($matches[0], 'Implements of ')) {
+                $displayWarning = true;
+            }
+            if ($this->strict) {
+                // In strict mode (the default), display a warning if the
+                // documentation does not contain "Implements ".
+                if (!strstr($matches[0], 'Implements ')) {
+                    $displayWarning = true;
+                }
+            }
+            else {
+                // Otherwise, only display a warning if the documentation does
+                // not contain either "Implements " or "Implementation of ".
+                if (!strstr($matches[0], 'Implementation of ') &&
+                    !strstr($matches[0], 'Implements ')) {
+                    $displayWarning = true;
+                }
+            }
+            // Display a warning if the wrong format is used.
+            if (!preg_match('/ (drush_)?hook_[a-zA-Z0-9_]+\(\)( for [a-z0-9_-]+(\(\)|\.tpl\.php|\.html.twig))?\.$/', $matches[0])) {
+                $displayWarning = true;
+            }
+            if ($displayWarning) {
+                if ($this->strict) {
+                    $phpcsFile->addWarning('Format should be "* Implements hook_foo().", "* Implements hook_foo_BAR_ID_bar() for xyz_bar().", "* Implements hook_foo_BAR_ID_bar() for xyz-bar.html.twig.", or "* Implements hook_foo_BAR_ID_bar() for xyz_bar.tpl.php.".', $short);
+                }
+                else {
+                    $phpcsFile->addWarning('Format should be "* [Implements|Implementation of] hook_foo().", "* [Implements|Implementation of] hook_foo_BAR_ID_bar() for xyz_bar().", "* [Implements|Implementation of] hook_foo_BAR_ID_bar() for xyz-bar.html.twig.", or "* [Implements|Implementation of] hook_foo_BAR_ID_bar() for xyz_bar.tpl.php.".', $short);
+                }
             } else {
                 // Check that a hook implementation does not duplicate @param and
                 // @return documentation.

@@ -19,6 +19,11 @@
   <!-- Do not run this sniff on template files. -->
   <exclude-pattern>*.tpl.php</exclude-pattern>
  </rule>
+ <rule ref="Drupal.Commenting.HookComment">
+  <properties>
+   <property name="strict" value="false"/>
+  </properties>
+ </rule>
  <rule ref="Drupal.ControlStructures.ControlSignature">
   <!-- Do not run this sniff on template files. -->
   <exclude-pattern>*.tpl.php</exclude-pattern>

@@ -518,7 +518,7 @@ class Drupal_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_S
                             // for the part after the last "\".
                             $name_parts = explode('\\', $suggestedTypeHint);
                             $last_part = end($name_parts);
-                            if ($last_part !== $typeHint) {
+                            if ($last_part !== $typeHint && substr($last_part, -2) !== '[]') {
                                 $error = 'Expected type hint "%s"; found "%s" for %s';
                                 $data  = array(
                                           $last_part,

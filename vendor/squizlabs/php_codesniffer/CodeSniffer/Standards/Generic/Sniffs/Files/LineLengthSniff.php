@@ -137,7 +137,7 @@ class Generic_Sniffs_Files_LineLengthSniff implements PHP_CodeSniffer_Sniff
 
             $error = 'Line exceeds maximum limit of %s characters; contains %s characters';
             $phpcsFile->addError($error, $stackPtr, 'MaxExceeded', $data);
-        } else if ($lineLength > $this->lineLimit) {
+        } else if ($lineLength > $this->lineLimit && $tokens[$stackPtr]['code'] !== T_DOC_COMMENT_STRING) {
             $data = array(
                      $this->lineLimit,
                      $lineLength,
